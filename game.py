@@ -6,6 +6,7 @@ import os
 import random
 # absolute path
 path = os.getcwd()
+import glo
 # python os path join method
 fontspath = os.path.join(path, "fonts")
 BLACK = (0, 0, 0)
@@ -13,10 +14,30 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 GRAY = (200, 200, 200)
+YELLOW = (255,255,0)
 pygame.init()
+
+x = 1
+def scoreup():
+    glo.score +=1
 def gameover():
-    execfile("ondeath.py")
+    runfile("ondeath.py")
     exit()
+class coin(object):
+    def __init__(self):
+        self.coin_spawn()
+
+    def coin_spawn(self):
+        self.coin_x = random.randrange(0, 615, 1)
+        self.coin_y = random.randrange(0, 615, 1)
+
+    def coin_drawing(self,color):
+        f = pygame.draw.rect(window,color, pygame.Rect(self.coin_x, self.coin_y, 30, 30))
+        collide3 = f.colliderect(cube)
+        if collide3:
+            glo.score+=1
+            f = pygame.draw.rect(window,color, pygame.Rect(999, 999, 30, 30))
+        
 class nmy(object):
 
     def __init__(self):
@@ -26,12 +47,12 @@ class nmy(object):
         self.food_x = random.randrange(0, 615, 1)
         self.food_y = random.randrange(0, 615, 1)
 
-    def nmy_drawing(self):
-        f = pygame.draw.rect(window, (255, 0, 0), pygame.Rect(self.food_x, self.food_y, 30, 30))
+    def nmy_drawing(self,color):
+        f = pygame.draw.rect(window, color , pygame.Rect(self.food_x, self.food_y, 30, 30))
         collide2 = f.colliderect(cube)
         if collide2:
-            gameover()
         
+            gameover()     
     
 
 x = 1
@@ -87,7 +108,7 @@ while run:
     window.blit(background, (0, 0))    # draw the scene  
     
     pygame.draw.rect(window, (255, 0, 0), cube)
-    bozo.nmy_drawing()
+    bozo.nmy_drawing(BLUE)
     
     collide = nono.colliderect(cube)
     if collide:
