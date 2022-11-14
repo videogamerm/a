@@ -1,2 +1,2 @@
 global score
-score = 0
+score = 1

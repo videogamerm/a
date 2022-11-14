@@ -13,7 +13,7 @@ surface = pygame.display.set_mode((600, 400))
 def start_the_game():
     import game
 
-menu = pygame_menu.Menu('Welcome', 400, 300,
+menu = pygame_menu.Menu('You Died', 400, 300,
                        theme=pygame_menu.themes.THEME_BLUE)
 
 '''menu.add.text_input('Name :', default=' ')

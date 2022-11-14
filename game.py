@@ -8,6 +8,7 @@ import random
 path = os.getcwd()
 import glo
 # python os path join method
+from pygame import mixer
 fontspath = os.path.join(path, "fonts")
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -23,39 +24,68 @@ def scoreup():
 def gameover():
     runfile("ondeath.py")
     exit()
-class coin(object):
-    def __init__(self):
-        self.coin_spawn()
-
-    def coin_spawn(self):
-        self.coin_x = random.randrange(0, 615, 1)
-        self.coin_y = random.randrange(0, 615, 1)
-
-    def coin_drawing(self,color):
-        f = pygame.draw.rect(window,color, pygame.Rect(self.coin_x, self.coin_y, 30, 30))
-        collide3 = f.colliderect(cube)
-        if collide3:
-            glo.score+=1
-            f = pygame.draw.rect(window,color, pygame.Rect(999, 999, 30, 30))
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, pos,f):
+        super().__init__()
         
-class nmy(object):
-
-    def __init__(self):
-        self.nmy_spawn()
-
-    def nmy_spawn(self):
-        self.food_x = random.randrange(0, 615, 1)
-        self.food_y = random.randrange(0, 615, 1)
-
-    def nmy_drawing(self,color):
-        f = pygame.draw.rect(window, color , pygame.Rect(self.food_x, self.food_y, 30, 30))
-        collide2 = f.colliderect(cube)
-        if collide2:
+        self.image = pygame.image.load("coin.png")
+        self.rect = self.image.get_rect()
+        if f == True:
+            self.food_x = random.randrange(0, 615, 1)
+            self.food_y = random.randrange(0, 615, 1)
+            self.rect.topleft = (self.food_x,self.food_y)
+        else:
+            self.rect.topleft = pos
         
+    def update(self):
+        if self.rect.colliderect(cube):
+            glo.score += 1
+            self.food_x = random.randrange(0, 615, 1)
+            self.food_y = random.randrange(0, 615, 1)
+            self.rect.topleft = (self.food_x,self.food_y)
+            self.kill()
+class Cube(pygame.sprite.Sprite):
+    def __init__():
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("cube.png")
+        self.rect = self.image.get_rect()
+        self.x = 350
+        self.y = 350
+        self.rect.topleft = (self.x,self.y)
+     
+              
+class nmy(pygame.sprite.Sprite):
+
+    def __init__(self, pos,f):
+        super().__init__()
+        
+        self.image = pygame.image.load("Enemy.png")
+        self.rect = self.image.get_rect()
+        if f == True:
+            self.food_x = random.randrange(0, 615, 1)
+            self.food_y = random.randrange(0, 615, 1)
+            self.rect.topleft = (self.food_x,self.food_y)
+        else:
+            self.rect.topleft = pos
+    def update(self):
+        opposite = 1
+        if self.food_x <=0 :
+            opposite = -1
+        if self.food_x >=650:
+            opposite = 1
+        self.food_x = (self.food_x +5 )* opposite 
+        if self.rect.colliderect(cube):
+            glo.score += 1
+            self.food_x = random.randrange(0, 615, 1)
+            self.food_y = random.randrange(0, 615, 1)
+            self.rect.topleft = (self.food_x,self.food_y)
             gameover()     
+            
+        
     
 
-x = 1
 
 
 
@@ -69,12 +99,15 @@ tiles = [((x*ts, y*ts, ts, ts), c1 if (x+y) % 2 == 0 else c2) for x in range((w+
 
 cube = pygame.Rect(0, 0, 20, 20)
 cube.center = window.get_rect().center
+cube2 = pygame.Rect(cube.x, cube.y, , height)
 speed = 5
-nono = pygame.draw.rect(background, BLUE, pygame.Rect(30, 30, 60, 60))
-nonoo = 10
+
 font1 = pygame.font.SysFont([os.path.join(fontspath,"LektonCode-Regular.ttf")], 72)
 
-    
+'''mixer.init()
+''''''mixer.music.load("Umm.wav")
+''''''mixer.music.set_volume(3)
+mixer.music.play(loops=99999)'''
 
 # Initialing Color
 colore = (0,255,0)
@@ -82,12 +115,11 @@ colore = (0,255,0)
 # Drawing Rectangle
 
 # main application loop
-while x<= 10:
-        bozo = nmy()
-        bozo.nmy_spawn()
-        
-        
-        x+=1
+bozo = nmy(1,True)
+l= Coin(1,True)
+b = Coin(1,True)
+window.blit(l.image, l.rect)
+window.blit(b.image, b.rect)
 run = True
 while run:
     # limit frames per second
@@ -99,20 +131,26 @@ while run:
             run = False
     # update the game states and positions of objects dependent on the input 
     keys = pygame.key.get_pressed()
-    cube.x += (keys[pygame.K_RIGHT] - keys[pygame.K_LEFT]) * speed
+    cube.x += (keys[pygame.K_RIGHT] - keys[pygame.K_LEFT]) * speed 
     cube.y += (keys[pygame.K_DOWN] - keys[pygame.K_UP]) * speed
     border_rect = window.get_rect()
     cube.clamp_ip(border_rect)
 
     # clear the display and draw background
     window.blit(background, (0, 0))    # draw the scene  
-    
+    window.blit(l.image, l.rect)
+    window.blit(b.image, b.rect)
+    window.blit(bozo.image, bozo.rect)
+    bozo.update()
+    b.update()    
+    l.update()
+    window.blit(cube2)
     pygame.draw.rect(window, (255, 0, 0), cube)
-    bozo.nmy_drawing(BLUE)
+    text = font1.render(str(glo.score), True, GREEN)
+    window.blit(text,(15,20))
     
-    collide = nono.colliderect(cube)
-    if collide:
-        gameover()
+
     pygame.display.flip()
+    
 pygame.quit()
 exit()
